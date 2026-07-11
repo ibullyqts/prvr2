@@ -4,7 +4,6 @@ import os
 import re
 import random
 import sys
-import httpx
 from playwright.async_api import async_playwright
 from playwright_stealth import Stealth
 
@@ -14,17 +13,6 @@ PULSE_DELAY = 100
 CYCLE_DURATION = 60     
 SESSION_MAX_SEC = 21000 
 sys.stdout.reconfigure(encoding='utf-8')
-
-# 🔱 TELEGRAM CONFIG
-TG_TOKEN = "7968897685:AAHWWUFmfRFYUFQxjV0GE_9Avhn-iRH2j7M"
-TG_CHAT_ID = "1225435208"
-
-async def send_tg(msg):
-    url = f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage"
-    try:
-        async with httpx.AsyncClient() as client:
-            await client.post(url, json={"chat_id": TG_CHAT_ID, "text": msg, "parse_mode": "HTML"}, timeout=5)
-    except: pass
 
 async def run_strike(node_id, cookie, target_id, target_name):
     async with async_playwright() as p:
@@ -53,34 +41,55 @@ async def run_strike(node_id, cookie, target_id, target_name):
             'domain': '.instagram.com', 'path': '/', 'secure': True, 'httpOnly': True
         }])
 
-        await send_tg(f"🔱 <b>Machine {node_id} BOLD PILLAR</b>\nAlign: Ultra-Vertical | Delay: 100ms")
-
-        # ⚡ BOLD ALIGNED SCRIPT
+        # ⚡ BOLD ALIGNED SCRIPT (UPDATED WITH TITAN TEXT & PASTE METHOD)
         strike_script = """
             (name, delay) => {
-                const getBlock = (n) => {
-                    const lines = [
-                        `__________________[${n}] 𝑷 𝑹 𝑽 𝑹 𝑷𝑨𝑷𝑨 𝑲𝑨 𝑮𝑼𝑳𝑨𝑴 🔱__________________`,
-                        `__________________[${n}] 𝑻𝑬𝑹𝑰 𝑴𝑨𝑨 𝑲𝑨 𝑩𝑯𝑶𝑺𝑫𝑨 🔥__________________`,
-                        `__________________[${n}] 𝑷 𝑹 𝑽 𝑹 𝑷𝑨𝑷𝑨 𝑵𝑬 𝑴𝑨𝑨 𝑪𝑯𝑶𝑫 𝑫𝑰 😂__________________`,
-                        `__________________[${n}] 𝑹𝑼𝑵𝑫𝑰 𝑲𝑬 𝑩𝑨𝑪𝑪𝑯𝑬 𝑩𝑨𝑨𝑷 𝑺𝑬 𝑫𝑨𝑹 🤡__________________`,
-                        `__________________[${n}] 𝑷 𝑹 𝑽 𝑹 𝑷𝑨𝑷𝑨 𝑻𝑬𝑹𝑨 𝑴𝑨𝑨𝑳𝑰𝑲 𝑯𝑨𝑰 👑__________________`,
-                        `__________________[${n}] 𝑻𝑬𝑹𝑰 𝑴𝑨𝑨 𝑲𝑰 𝑪𝑯𝑼𝑻 𝑴𝑨𝑰 𝑯𝑨𝑻𝑯𝑶𝑫𝑨 🔨__________________`
-                    ];
-                    const baseLine = lines[Math.floor(Math.random() * lines.length)];
-                    let block = "";
-                    for(let i = 0; i < 21; i++) { block += baseLine + "\\n"; }
-                    return block + "🔱 " + Math.random().toString(36).substring(8).toUpperCase();
+                const getBlock = () => {
+                    const emojis = ["💙", "❤️", "💚", "💛", "💜", "🖤", "🤍", "🤎", "🧡", "💖"];
+                    const currentEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+                    const line = "Yᴀsʜ - Hᴀʀɪsʜ - Mᴇᴍᴀx 𝚃𝙼𝙺𝙲 " + currentEmoji + "་༘࿐";
+                    
+                    let text = "";
+                    for(let i = 0; i < 10; i++) { 
+                        text += line + "\\n\\n\\n\\n"; 
+                    }
+                    return text;
                 }
 
                 const pulse = () => {
                     const box = document.querySelector('div[role="textbox"], [contenteditable="true"]');
                     if (box) {
+                        const text = getBlock();
+                        
+                        // 1. Create a virtual clipboard event
+                        const dataTransfer = new DataTransfer();
+                        dataTransfer.setData('text/plain', text);
+                        
+                        const pasteEvent = new ClipboardEvent('paste', {
+                            clipboardData: dataTransfer,
+                            bubbles: true,
+                            cancelable: true
+                        });
+                        
+                        // 2. Focus and inject via paste event
                         box.focus();
-                        document.execCommand('insertText', false, getBlock(name));
+                        box.dispatchEvent(pasteEvent);
+                        
+                        // 3. Trigger input event to update React state
                         box.dispatchEvent(new Event('input', { bubbles: true }));
-                        box.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Enter', keyCode: 13 }));
-                        box.innerHTML = "";
+                        
+                        // 4. Trigger send button
+                        setTimeout(() => {
+                            const sendBtn = Array.from(document.querySelectorAll('div[role="button"], button')).find(el => 
+                                el.textContent === 'Send' || el.innerText === 'Send'
+                            );
+                            if (sendBtn) {
+                                sendBtn.click();
+                            } else {
+                                const fallbackBtn = document.querySelector('form button[type="button"], div[aria-label="Send"]');
+                                if (fallbackBtn) fallbackBtn.click();
+                            }
+                        }, 200);
                     }
                     setTimeout(() => { requestAnimationFrame(pulse); }, delay);
                 }
