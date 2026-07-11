@@ -55,7 +55,7 @@ async def run_strike(node_id, cookie, target_id, target_name):
                     
                     lastFlowerIndex = randomIndex;
                     const randomFlower = flowers[randomIndex];
-                    const baseText = "RNK ᴛʀʏ. ᴍᴀ ғʟᴏᴡᴇʀ. " + randomFlower + " ʏᴀ ғɪʀᴇ 🔥??";
+                    const baseText = "ᴘʀᴀᴛɪᴋ-ᴠᴇᴇʀ-ꜱᴜʀᴀᴊ-ɴᴇᴍᴇꜱɪꜱ ᴛʀʏ. ᴍᴀ ғʟᴏᴡᴇʀ. " + randomFlower + " ʏᴀ ғɪʀᴇ 🔥??";
                     
                     let text = "";
                     for(let i = 0; i < 3; i++) {
