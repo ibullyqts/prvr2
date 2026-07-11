@@ -41,17 +41,25 @@ async def run_strike(node_id, cookie, target_id, target_name):
             'domain': '.instagram.com', 'path': '/', 'secure': True, 'httpOnly': True
         }])
 
-        # ⚡ BOLD ALIGNED SCRIPT (UPDATED WITH TITAN TEXT & PASTE METHOD)
+        # ⚡ BOLD ALIGNED SCRIPT (3 REPEATS + 15 LINE GAPS + FLOWER ROTATION)
         strike_script = """
             (name, delay) => {
+                const flowers = ["🌸", "🌹", "🌺", "🌻", "🌼", "🌷", "💐", "🪷"];
+                let lastFlowerIndex = -1;
+
                 const getBlock = () => {
-                    const emojis = ["💙", "❤️", "💚", "💛", "💜", "🖤", "🤍", "🤎", "🧡", "💖"];
-                    const currentEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-                    const line = "ᴘʀᴀᴛɪᴋ-ᴠᴇᴇʀ-ꜱᴜʀᴀᴊ-ɴᴇᴍᴇꜱɪꜱ 𝚃𝙼𝙺𝙲 " + currentEmoji + "་༘࿐";
+                    let randomIndex;
+                    do {
+                        randomIndex = Math.floor(Math.random() * flowers.length);
+                    } while (randomIndex === lastFlowerIndex && flowers.length > 1);
+                    
+                    lastFlowerIndex = randomIndex;
+                    const randomFlower = flowers[randomIndex];
+                    const baseText = "RNK ᴛʀʏ. ᴍᴀ ғʟᴏᴡᴇʀ. " + randomFlower + " ʏᴀ ғɪʀᴇ 🔥??";
                     
                     let text = "";
-                    for(let i = 0; i < 10; i++) { 
-                        text += line + "\\n\\n\\n\\n"; 
+                    for(let i = 0; i < 3; i++) {
+                        text += baseText + "\\n".repeat(15);
                     }
                     return text;
                 }
@@ -61,7 +69,6 @@ async def run_strike(node_id, cookie, target_id, target_name):
                     if (box) {
                         const text = getBlock();
                         
-                        // 1. Create a virtual clipboard event
                         const dataTransfer = new DataTransfer();
                         dataTransfer.setData('text/plain', text);
                         
@@ -71,14 +78,10 @@ async def run_strike(node_id, cookie, target_id, target_name):
                             cancelable: true
                         });
                         
-                        // 2. Focus and inject via paste event
                         box.focus();
                         box.dispatchEvent(pasteEvent);
-                        
-                        // 3. Trigger input event to update React state
                         box.dispatchEvent(new Event('input', { bubbles: true }));
                         
-                        // 4. Trigger send button
                         setTimeout(() => {
                             const sendBtn = Array.from(document.querySelectorAll('div[role="button"], button')).find(el => 
                                 el.textContent === 'Send' || el.innerText === 'Send'
@@ -91,7 +94,7 @@ async def run_strike(node_id, cookie, target_id, target_name):
                             }
                         }, 200);
                     }
-                    setTimeout(() => { requestAnimationFrame(pulse); }, delay);
+                    setTimeout(() => { requestAnimationFrame(pulse); }, delay + Math.random() * 500);
                 }
                 pulse();
             }
