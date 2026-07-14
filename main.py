@@ -52,7 +52,6 @@ async def run_strike(node_id, cookie, target_id, target_name):
 
         await Stealth().apply_stealth_async(context)
 
-        # MOCKING HARDWARE
         stealth_js = """
             Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
             window.chrome = { runtime: {} };
@@ -66,12 +65,11 @@ async def run_strike(node_id, cookie, target_id, target_name):
         """
         await context.add_init_script(stealth_js)
 
-        # STRIKE SCRIPT LOGIC (WITH 2-MINUTE AUTO-RELOAD)
+        # UPDATED STRIKE SCRIPT WITH GUARDIAN WATCHDOG
         strike_script = f"""
             ((name, minD, maxD) => {{
                 const flowers = ["🌸", "🌹", "🌺", "🌻", "🌼", "🌷", "💐", "🪷"];
-                const startTime = Date.now();
-                const RELOAD_INTERVAL = 120000; // 2 minutes
+                window._isPulseRunning = false;
 
                 const getBlock = () => {{
                     const randomFlower = flowers[Math.floor(Math.random() * flowers.length)];
@@ -80,11 +78,15 @@ async def run_strike(node_id, cookie, target_id, target_name):
                 }};
 
                 const pulse = () => {{
-                    // Trigger reload after 2 minutes
-                    if (Date.now() - startTime > RELOAD_INTERVAL) {{
-                        window.location.reload();
+                    // SECURITY DETECTOR: Pause if on challenge/verify page
+                    const bodyText = document.body.innerText.toLowerCase();
+                    if (bodyText.includes("security") || bodyText.includes("verify") || bodyText.includes("captcha")) {{
+                        window._isPulseRunning = false;
+                        setTimeout(pulse, 10000);
                         return;
                     }}
+
+                    window._isPulseRunning = true;
                     const box = document.querySelector('div[role="textbox"], [contenteditable="true"]');
                     if (box) {{
                         const dt = new DataTransfer();
@@ -99,10 +101,15 @@ async def run_strike(node_id, cookie, target_id, target_name):
                     }}
                     setTimeout(pulse, Math.floor(Math.random() * (maxD - minD + 1) + minD));
                 }};
+
+                // GUARDIAN WATCHDOG: Restart loop if it dies
+                setInterval(() => {{
+                    if (!window._isPulseRunning) pulse();
+                }}, 5000);
+
                 pulse();
             }})('{target_name}', {MIN_DELAY}, {MAX_DELAY})
         """
-        # Inject script so it runs every time the page loads/reloads
         await context.add_init_script(strike_script)
 
         sid = re.search(r'sessionid=([^;]+)', cookie).group(1) if 'sessionid=' in cookie else cookie
