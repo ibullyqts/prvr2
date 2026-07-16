@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main  # Autostarts immediately when you upload or edit the code
+      - main 
 
 permissions:
   actions: write
@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         machine-id: [1, 2, 3]
-      fail-fast: false # Prevents one machine crashing from stopping the others
+      fail-fast: false 
 
     steps:
       - name: Checkout Code
@@ -37,20 +37,20 @@ jobs:
         env:
           SESSION_ID: ${{ secrets.SESSION_ID }}
           GROUP_URL: ${{ secrets.GROUP_URL }}
-          PYTHONUNBUFFERED: "1" # Forces Python to output logs immediately
+          MACHINE_ID: ${{ matrix.machine-id }}
+          PYTHONUNBUFFERED: "1" 
         run: |
           python -u main.py
 
   restart:
     needs: run-loop
-    if: always() # Ensures it restarts even if a machine crashes or times out
+    # Changing to 'success()' ensures that if you hit 'Cancel' 
+    # or the job fails, the next workflow will NOT be triggered.
+    if: success() 
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code (for gh cli)
-        uses: actions/checkout@v4
-        
       - name: Trigger Next Run
         env:
           GH_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
-          gh workflow run main.yml
+          gh workflow run "Phoenix V100 (5-Machine Matrix)" --ref main
